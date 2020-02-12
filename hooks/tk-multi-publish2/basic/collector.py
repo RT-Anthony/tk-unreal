@@ -109,7 +109,7 @@ class UnrealSessionCollector(HookBaseClass):
         session_item.set_icon_from_path(icon_path)
 
         # Set the project root
-        unreal_sg = unreal.ShotgunEngine.get_instance() #sgtk.platform.current_engine().unreal_sg_engine
+        unreal_sg = unreal.ShotgunEngine.get_instance()  #sgtk.platform.current_engine().unreal_sg_engine
         project_root = unreal_sg.get_shotgun_work_dir()
         
         # Important to convert "/" in path returned by Unreal to "\" for templates to work
@@ -142,7 +142,7 @@ class UnrealSessionCollector(HookBaseClass):
 
         :param parent_item: Parent Item instance
         """
-        unreal_sg = sgtk.platform.current_engine().unreal_sg_engine
+        unreal_sg = unreal.ShotgunEngine.get_instance()  #sgtk.platform.current_engine().unreal_sg_engine
         
         # Iterate through the selected assets and get their info and add them as items to be published
         for asset in unreal_sg.selected_assets:
