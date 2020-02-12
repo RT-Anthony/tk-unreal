@@ -317,8 +317,8 @@ class ShotgunEngineWrapper(unreal.ShotgunEngine):
 
         for app_name in sorted(commands_by_app.keys()):
             # Exclude the Publish app if it doesn't have any context
-            if app_name == "Publish" and not has_selection:
-                continue
+            # if app_name == "Publish" and not has_selection:
+            #     continue
                 
             if len(commands_by_app[app_name]) > 1:
                 # more than one menu entry fort his app
