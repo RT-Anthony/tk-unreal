@@ -104,7 +104,7 @@ class UnrealSessionCollector(HookBaseClass):
             "unreal.png"
         )
 
-        avi_item = session_item.create_item(
+        avi_item = parent_item.create_item(
             "unreal.session.movie",
             "Unreal Movie"
             "movie.avi"
