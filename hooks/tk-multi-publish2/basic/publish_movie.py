@@ -462,8 +462,8 @@ class UnrealMoviePublishPlugin(HookBaseClass):
         
         cmdline_args.append("-game")
         cmdline_args.append("-MovieSceneCaptureType=/Script/MovieSceneCapture.AutomatedLevelSequenceCapture")
-        cmdline_args.append("-ResX=1280")
-        cmdline_args.append("-ResY=720")
+        cmdline_args.append("-ResX=1920")
+        cmdline_args.append("-ResY=1080")
         cmdline_args.append("-ForceRes")
         cmdline_args.append("-Windowed")
         cmdline_args.append("-MovieCinematicMode=yes")
