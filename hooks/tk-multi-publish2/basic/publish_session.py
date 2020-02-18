@@ -119,7 +119,7 @@ class UnrealSessionPublishPlugin(HookBaseClass):
         # If you use the logger, warnings will appear in the validation tree.
         # You can attach callbacks that allow users to fix these warnings
         # at the press of a button.
-        pass
+        return True
 
     def publish(self, settings, item):
         """
