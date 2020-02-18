@@ -103,10 +103,17 @@ class UnrealSessionCollector(HookBaseClass):
             "icons",
             "unreal.png"
         )
+
+        avi_item = session_item.create_item(
+            "unreal.session.movie",
+            "Unreal Movie"
+            "movie.avi"
+        )
         
         # Set the icon for the session item
         # Will also be used for the children items parented to the session item
         session_item.set_icon_from_path(icon_path)
+        avi_item.set_icon_from_path(icon_path)
 
         # Set the project root
         unreal_sg = unreal.ShotgunEngine.get_instance()  #sgtk.platform.current_engine().unreal_sg_engine

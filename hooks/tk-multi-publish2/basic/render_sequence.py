@@ -91,7 +91,7 @@ class UnrealMoviePublishPlugin(HookBaseClass):
         accept() method. Strings can contain glob patters such as *, for example
         ["maya.*", "file.maya"]
         """
-        return ["unreal.asset.LevelSequence"]
+        return ["unreal.session.movie"]
 
     def accept(self, settings, item):
         """
