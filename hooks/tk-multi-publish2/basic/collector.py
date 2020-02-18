@@ -110,7 +110,7 @@ class UnrealSessionCollector(HookBaseClass):
 
         avi_item = session_item.create_item(
             "unreal.session.movie",
-            "Unreal Movie"
+            "Unreal Movie",
             "Render Sequence"
         )
 
