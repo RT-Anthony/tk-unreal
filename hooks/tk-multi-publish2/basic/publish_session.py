@@ -115,24 +115,11 @@ class UnrealSessionPublishPlugin(HookBaseClass):
         :param item: Item to process
         :returns: True if item is valid, False otherwise.
         """
-
         # raise an exception here if something is not valid.
         # If you use the logger, warnings will appear in the validation tree.
         # You can attach callbacks that allow users to fix these warnings
         # at the press of a button.
-        #
-        # For example:
-        #
-        # self.logger.info(
-        #         "Your session is not part of a maya project.",
-        #         extra={
-        #             "action_button": {
-        #                 "label": "Set Project",
-        #                 "tooltip": "Set the maya project",
-        #                 "callback": lambda: mel.eval('setProject ""')
-        #             }
-        #         }
-        #     )
+        pass
 
     def publish(self, settings, item):
         """

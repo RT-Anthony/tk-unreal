@@ -170,75 +170,75 @@ class UnrealMoviePublishPlugin(HookBaseClass):
         #         }
         #     )
 
-        asset_path = item.properties.get("asset_path")
-        asset_name = item.properties.get("asset_name")
-        if not asset_path or not asset_name:
-            self.logger.debug("Sequence path or name not configured.")
-            return False
-
-        # Get the configured publish template
-        publish_template = item.properties.get("publish_template")
-
-        # Get the context from the Publisher UI
-        context = item.context
-        unreal.log("context: {}".format(context))
-
-        # Query the fields needed for the publish template from the context
-        try:
-            fields = context.as_template_fields(publish_template)
-        except Exception:
-            # We likely failed because of folder creation, trigger that
-            self.parent.sgtk.create_filesystem_structure(
-                context.entity["type"],
-                context.entity["id"],
-                self.parent.engine,
-            )
-            # In theory, this should now work because we've created folders and
-            # updated the path cache
-            fields = item.context.as_template_fields(publish_template)
-        unreal.log("context fields: {}".format(fields))
-
-        # Ensure that the current map is saved on disk
-        unreal_map = unreal.EditorLevelLibrary.get_editor_world()
-        unreal_map_path = unreal_map.get_path_name()
-
-        # Transient maps are not supported, must be saved on disk
-        if unreal_map_path.startswith("/Temp/"):
-            self.logger.debug("Current map must be saved first.")
-            return False
-
-        # Add the map name and level sequence to fields
-        world_name = unreal_map.get_name()
-        fields["world"] = world_name
-        fields["level_sequence"] = asset_name
-
-        # Stash the level sequence and map paths in properties for the render
-        item.properties["unreal_asset_path"] = asset_path
-        item.properties["unreal_map_path"] = unreal_map_path
-
-        # Add a version number to the fields, incremented from the current asset version
-        version_number = self._unreal_asset_get_version(asset_path)
-        version_number = version_number + 1
-        fields["version"] = version_number
-
-        # Add today's date to the fields
-        date = datetime.date.today()
-        fields["YYYY"] = date.year
-        fields["MM"] = date.month
-        fields["DD"] = date.day
-
-        # ensure the fields work for the publish template
-        missing_keys = publish_template.missing_keys(fields)
-        if missing_keys:
-            error_msg = "Missing keys required for the publish template " \
-                        "%s" % (missing_keys)
-            self.logger.error(error_msg)
-            raise Exception(error_msg)
-
-        item.properties["path"] = publish_template.apply_fields(fields)
-        item.properties["publish_path"] = item.properties["path"]
-        item.properties["publish_type"] = "Unreal Render"
-        item.properties["version_number"] = version_number
+        # asset_path = item.properties.get("asset_path")
+        # asset_name = item.properties.get("asset_name")
+        # if not asset_path or not asset_name:
+        #     self.logger.debug("Sequence path or name not configured.")
+        #     return False
+        #
+        # # Get the configured publish template
+        # publish_template = item.properties.get("publish_template")
+        #
+        # # Get the context from the Publisher UI
+        # context = item.context
+        # unreal.log("context: {}".format(context))
+        #
+        # # Query the fields needed for the publish template from the context
+        # try:
+        #     fields = context.as_template_fields(publish_template)
+        # except Exception:
+        #     # We likely failed because of folder creation, trigger that
+        #     self.parent.sgtk.create_filesystem_structure(
+        #         context.entity["type"],
+        #         context.entity["id"],
+        #         self.parent.engine,
+        #     )
+        #     # In theory, this should now work because we've created folders and
+        #     # updated the path cache
+        #     fields = item.context.as_template_fields(publish_template)
+        # unreal.log("context fields: {}".format(fields))
+        #
+        # # Ensure that the current map is saved on disk
+        # unreal_map = unreal.EditorLevelLibrary.get_editor_world()
+        # unreal_map_path = unreal_map.get_path_name()
+        #
+        # # Transient maps are not supported, must be saved on disk
+        # if unreal_map_path.startswith("/Temp/"):
+        #     self.logger.debug("Current map must be saved first.")
+        #     return False
+        #
+        # # Add the map name and level sequence to fields
+        # world_name = unreal_map.get_name()
+        # fields["world"] = world_name
+        # fields["level_sequence"] = asset_name
+        #
+        # # Stash the level sequence and map paths in properties for the render
+        # item.properties["unreal_asset_path"] = asset_path
+        # item.properties["unreal_map_path"] = unreal_map_path
+        #
+        # # Add a version number to the fields, incremented from the current asset version
+        # version_number = self._unreal_asset_get_version(asset_path)
+        # version_number = version_number + 1
+        # fields["version"] = version_number
+        #
+        # # Add today's date to the fields
+        # date = datetime.date.today()
+        # fields["YYYY"] = date.year
+        # fields["MM"] = date.month
+        # fields["DD"] = date.day
+        #
+        # # ensure the fields work for the publish template
+        # missing_keys = publish_template.missing_keys(fields)
+        # if missing_keys:
+        #     error_msg = "Missing keys required for the publish template " \
+        #                 "%s" % (missing_keys)
+        #     self.logger.error(error_msg)
+        #     raise Exception(error_msg)
+        #
+        # item.properties["path"] = publish_template.apply_fields(fields)
+        # item.properties["publish_path"] = item.properties["path"]
+        # item.properties["publish_type"] = "Unreal Render"
+        # item.properties["version_number"] = version_number
 
         return True
 
@@ -252,94 +252,94 @@ class UnrealMoviePublishPlugin(HookBaseClass):
         :param item: Item to process
         """
 
-        # This is where you insert custom information into `item`, like the
-        # path of the file being published or any dependency this publish
-        # has on other publishes.
-
-        # get the path in a normalized state. no trailing separator, separators
-        # are appropriate for current os, no double separators, etc.
-
-        # let the base class register the publish
-
-        publish_path = item.properties.get("path")
-        publish_path = os.path.normpath(publish_path)
-
-        # Split the destination path into folder and filename
-        destination_folder = os.path.split(publish_path)[0]
-        movie_name = os.path.split(publish_path)[1]
-        movie_name = os.path.splitext(movie_name)[0]
-
-        # Ensure that the destination path exists before rendering the sequence
-        self.parent.ensure_folder_exists(destination_folder)
-
-        # Get the level sequence and map paths again
-        unreal_asset_path = item.properties["unreal_asset_path"]
-        unreal_map_path = item.properties["unreal_map_path"]
-        unreal.log("movie name: {}".format(movie_name))
-        # Render the movie
-        self._unreal_render_sequence_to_movie(destination_folder, unreal_map_path, unreal_asset_path, movie_name)
-
-        # Increment the version number
-        self._unreal_asset_set_version(unreal_asset_path, item.properties["version_number"])
-
-        # Publish the movie file to Shotgun
-        super(UnrealMoviePublishPlugin, self).publish(settings, item)
-
-        # Create a Version entry linked with the new publish
-        publish_name = item.properties.get("publish_name")
-
-        # Populate the version data to send to SG
-        self.logger.info("Creating Version...")
-        version_data = {
-            "project": item.context.project,
-            "code": movie_name,
-            "description": item.description,
-            "entity": self._get_version_entity(item),
-            "sg_path_to_movie": publish_path,
-            "sg_task": item.context.task
-        }
-
-        publish_data = item.properties.get("sg_publish_data")
-
-        # If the file was published, add the publish data to the version
-        if publish_data:
-            version_data["published_files"] = [publish_data]
-
-        # Log the version data for debugging
-        self.logger.debug(
-            "Populated Version data...",
-            extra={
-                "action_show_more_info": {
-                    "label": "Version Data",
-                    "tooltip": "Show the complete Version data dictionary",
-                    "text": "<pre>%s</pre>" % (
-                        pprint.pformat(version_data),)
-                }
-            }
-        )
-
-        # Create the version
-        self.logger.info("Creating version for review...")
-        version = self.parent.shotgun.create("Version", version_data)
-
-        # Stash the version info in the item just in case
-        item.properties["sg_version_data"] = version
-
-        # On windows, ensure the path is utf-8 encoded to avoid issues with
-        # the shotgun api
-        upload_path = item.properties.get("publish_path")
-        unreal.log("upload_path: {}".format(upload_path))
-        if sys.platform.startswith("win"):
-            upload_path = upload_path.decode("utf-8")
-
-        # Upload the file to SG
-        self.logger.info("Uploading content...")
-        self.parent.shotgun.upload(
-            "Version",
-            version["id"],
-            upload_path,
-            "sg_uploaded_movie"
-        )
+        # # This is where you insert custom information into `item`, like the
+        # # path of the file being published or any dependency this publish
+        # # has on other publishes.
+        #
+        # # get the path in a normalized state. no trailing separator, separators
+        # # are appropriate for current os, no double separators, etc.
+        #
+        # # let the base class register the publish
+        #
+        # publish_path = item.properties.get("path")
+        # publish_path = os.path.normpath(publish_path)
+        #
+        # # Split the destination path into folder and filename
+        # destination_folder = os.path.split(publish_path)[0]
+        # movie_name = os.path.split(publish_path)[1]
+        # movie_name = os.path.splitext(movie_name)[0]
+        #
+        # # Ensure that the destination path exists before rendering the sequence
+        # self.parent.ensure_folder_exists(destination_folder)
+        #
+        # # Get the level sequence and map paths again
+        # unreal_asset_path = item.properties["unreal_asset_path"]
+        # unreal_map_path = item.properties["unreal_map_path"]
+        # unreal.log("movie name: {}".format(movie_name))
+        # # Render the movie
+        # self._unreal_render_sequence_to_movie(destination_folder, unreal_map_path, unreal_asset_path, movie_name)
+        #
+        # # Increment the version number
+        # self._unreal_asset_set_version(unreal_asset_path, item.properties["version_number"])
+        #
+        # # Publish the movie file to Shotgun
+        # super(UnrealMoviePublishPlugin, self).publish(settings, item)
+        #
+        # # Create a Version entry linked with the new publish
+        # publish_name = item.properties.get("publish_name")
+        #
+        # # Populate the version data to send to SG
+        # self.logger.info("Creating Version...")
+        # version_data = {
+        #     "project": item.context.project,
+        #     "code": movie_name,
+        #     "description": item.description,
+        #     "entity": self._get_version_entity(item),
+        #     "sg_path_to_movie": publish_path,
+        #     "sg_task": item.context.task
+        # }
+        #
+        # publish_data = item.properties.get("sg_publish_data")
+        #
+        # # If the file was published, add the publish data to the version
+        # if publish_data:
+        #     version_data["published_files"] = [publish_data]
+        #
+        # # Log the version data for debugging
+        # self.logger.debug(
+        #     "Populated Version data...",
+        #     extra={
+        #         "action_show_more_info": {
+        #             "label": "Version Data",
+        #             "tooltip": "Show the complete Version data dictionary",
+        #             "text": "<pre>%s</pre>" % (
+        #                 pprint.pformat(version_data),)
+        #         }
+        #     }
+        # )
+        #
+        # # Create the version
+        # self.logger.info("Creating version for review...")
+        # version = self.parent.shotgun.create("Version", version_data)
+        #
+        # # Stash the version info in the item just in case
+        # item.properties["sg_version_data"] = version
+        #
+        # # On windows, ensure the path is utf-8 encoded to avoid issues with
+        # # the shotgun api
+        # upload_path = item.properties.get("publish_path")
+        # unreal.log("upload_path: {}".format(upload_path))
+        # if sys.platform.startswith("win"):
+        #     upload_path = upload_path.decode("utf-8")
+        #
+        # # Upload the file to SG
+        # self.logger.info("Uploading content...")
+        # self.parent.shotgun.upload(
+        #     "Version",
+        #     version["id"],
+        #     upload_path,
+        #     "sg_uploaded_movie"
+        # )
         self.logger.info("Upload complete!")
 
     def finalize(self, settings, item):
