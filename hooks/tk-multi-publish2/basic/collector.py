@@ -123,6 +123,7 @@ class UnrealSessionCollector(HookBaseClass):
         # Important to convert "/" in path returned by Unreal to "\" for templates to work
         project_root = project_root.replace("/", "\\")
         session_item.properties["project_root"] = project_root
+        session_item.properties["path"] = project_root
 
         self.logger.info("Current Unreal project folder is: %s." % (project_root))
 
