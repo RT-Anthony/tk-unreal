@@ -87,7 +87,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         accept() method. Strings can contain glob patters such as *, for example
         ["maya.*", "file.maya"]
         """
-        return ["unreal.asset.StaticMesh"]
+        return ["unreal.asset.StaticMesh", "unreal.asset.SkeletalMesh"]
 
     def accept(self, settings, item):
         """

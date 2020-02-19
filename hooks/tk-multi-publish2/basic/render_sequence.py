@@ -170,75 +170,75 @@ class UnrealMoviePublishPlugin(HookBaseClass):
         #         }
         #     )
 
-        # asset_path = item.properties.get("asset_path")
-        # asset_name = item.properties.get("asset_name")
-        # if not asset_path or not asset_name:
-        #     self.logger.debug("Sequence path or name not configured.")
-        #     return False
-        #
-        # # Get the configured publish template
-        # publish_template = item.properties.get("publish_template")
-        #
-        # # Get the context from the Publisher UI
-        # context = item.context
-        # unreal.log("context: {}".format(context))
-        #
-        # # Query the fields needed for the publish template from the context
-        # try:
-        #     fields = context.as_template_fields(publish_template)
-        # except Exception:
-        #     # We likely failed because of folder creation, trigger that
-        #     self.parent.sgtk.create_filesystem_structure(
-        #         context.entity["type"],
-        #         context.entity["id"],
-        #         self.parent.engine,
-        #     )
-        #     # In theory, this should now work because we've created folders and
-        #     # updated the path cache
-        #     fields = item.context.as_template_fields(publish_template)
-        # unreal.log("context fields: {}".format(fields))
-        #
-        # # Ensure that the current map is saved on disk
-        # unreal_map = unreal.EditorLevelLibrary.get_editor_world()
-        # unreal_map_path = unreal_map.get_path_name()
-        #
-        # # Transient maps are not supported, must be saved on disk
-        # if unreal_map_path.startswith("/Temp/"):
-        #     self.logger.debug("Current map must be saved first.")
-        #     return False
-        #
-        # # Add the map name and level sequence to fields
-        # world_name = unreal_map.get_name()
-        # fields["world"] = world_name
-        # fields["level_sequence"] = asset_name
-        #
-        # # Stash the level sequence and map paths in properties for the render
-        # item.properties["unreal_asset_path"] = asset_path
-        # item.properties["unreal_map_path"] = unreal_map_path
-        #
-        # # Add a version number to the fields, incremented from the current asset version
-        # version_number = self._unreal_asset_get_version(asset_path)
-        # version_number = version_number + 1
-        # fields["version"] = version_number
-        #
-        # # Add today's date to the fields
-        # date = datetime.date.today()
-        # fields["YYYY"] = date.year
-        # fields["MM"] = date.month
-        # fields["DD"] = date.day
-        #
-        # # ensure the fields work for the publish template
-        # missing_keys = publish_template.missing_keys(fields)
-        # if missing_keys:
-        #     error_msg = "Missing keys required for the publish template " \
-        #                 "%s" % (missing_keys)
-        #     self.logger.error(error_msg)
-        #     raise Exception(error_msg)
-        #
-        # item.properties["path"] = publish_template.apply_fields(fields)
-        # item.properties["publish_path"] = item.properties["path"]
-        # item.properties["publish_type"] = "Unreal Render"
-        # item.properties["version_number"] = version_number
+        asset_path = "/Game/Cinematics/Sequences/Sequence/SequenceMaster"  # TODO set this programatically
+        asset_name = item.properties.get("asset_name")
+        if not asset_path or not asset_name:
+            self.logger.debug("Sequence path or name not configured.")
+            return False
+
+        # Get the configured publish template
+        publish_template = item.properties.get("publish_template")
+
+        # Get the context from the Publisher UI
+        context = item.context
+        unreal.log("context: {}".format(context))
+
+        # Query the fields needed for the publish template from the context
+        try:
+            fields = context.as_template_fields(publish_template)
+        except Exception:
+            # We likely failed because of folder creation, trigger that
+            self.parent.sgtk.create_filesystem_structure(
+                context.entity["type"],
+                context.entity["id"],
+                self.parent.engine,
+            )
+            # In theory, this should now work because we've created folders and
+            # updated the path cache
+            fields = item.context.as_template_fields(publish_template)
+        unreal.log("context fields: {}".format(fields))
+
+        # Ensure that the current map is saved on disk
+        unreal_map = unreal.EditorLevelLibrary.get_editor_world()
+        unreal_map_path = unreal_map.get_path_name()
+
+        # Transient maps are not supported, must be saved on disk
+        if unreal_map_path.startswith("/Temp/"):
+            self.logger.debug("Current map must be saved first.")
+            return False
+
+        # Add the map name and level sequence to fields
+        world_name = unreal_map.get_name()
+        fields["world"] = world_name
+        fields["level_sequence"] = asset_name
+
+        # Stash the level sequence and map paths in properties for the render
+        item.properties["unreal_asset_path"] = asset_path
+        item.properties["unreal_map_path"] = unreal_map_path
+
+        # Add a version number to the fields, incremented from the current asset version
+        version_number = self._unreal_asset_get_version(asset_path)
+        version_number = version_number + 1
+        fields["version"] = version_number
+
+        # Add today's date to the fields
+        date = datetime.date.today()
+        fields["YYYY"] = date.year
+        fields["MM"] = date.month
+        fields["DD"] = date.day
+
+        # ensure the fields work for the publish template
+        missing_keys = publish_template.missing_keys(fields)
+        if missing_keys:
+            error_msg = "Missing keys required for the publish template " \
+                        "%s" % (missing_keys)
+            self.logger.error(error_msg)
+            raise Exception(error_msg)
+
+        item.properties["path"] = publish_template.apply_fields(fields)
+        item.properties["publish_path"] = item.properties["path"]
+        item.properties["publish_type"] = "Unreal Render"
+        item.properties["version_number"] = version_number
 
         return True
 
