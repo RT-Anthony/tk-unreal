@@ -310,7 +310,7 @@ def _generate_fbx_export_task(destination_path, asset_path, asset_name):
     # Setup export options for the export task
     task.options = unreal.FbxExportOption()
     # These are the default options for the FBX export
-    # task.options.fbx_export_compatibility = fbx_2013
+    task.options.fbx_export_compatibility = unreal.FbxExportCompatibility.FBX_2018
     # task.options.ascii = False
     # task.options.force_front_x_axis = False
     # task.options.vertex_color = True
