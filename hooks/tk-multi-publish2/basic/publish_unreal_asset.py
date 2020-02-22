@@ -87,7 +87,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         accept() method. Strings can contain glob patters such as *, for example
         ["maya.*", "file.maya"]
         """
-        return ["unreal.asset.StaticMesh"]
+        return ["unreal.asset.SkeletalMesh"]
 
     def accept(self, settings, item):
         """
@@ -148,65 +148,6 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         :param item: Item to process
         :returns: True if item is valid, False otherwise.
         """
-        # raise an exception here if something is not valid.
-        # If you use the logger, warnings will appear in the validation tree.
-        # You can attach callbacks that allow users to fix these warnings
-        # at the press of a button.
-        #
-        # For example:
-        #
-        # self.logger.info(
-        #         "Your session is not part of a maya project.",
-        #         extra={
-        #             "action_button": {
-        #                 "label": "Set Project",
-        #                 "tooltip": "Set the maya project",
-        #                 "callback": lambda: mel.eval('setProject ""')
-        #             }
-        #         }
-        #     )
-
-        asset_path = item.properties.get("asset_path")
-        asset_name = item.properties.get("asset_name")
-        if not asset_path or not asset_name:
-            self.logger.debug("Asset path or name not configured.")
-            return False
-
-        publish_template = item.properties.get("publish_template")
-        if not publish_template:
-            self.logger.debug("No publish template configured.")
-            return False
-
-        # Add the Unreal asset name to the fields
-        fields = {"name" : asset_name}
-
-        # Add today's date to the fields
-        date = datetime.date.today()
-        fields["YYYY"] = date.year
-        fields["MM"] = date.month
-        fields["DD"] = date.day
-
-        # Stash the Unrea asset path and name in properties
-        item.properties["asset_path"] = asset_path
-        item.properties["asset_name"] = asset_name
-
-        # Get destination path for exported FBX from publish template
-        # which should be project root + publish template
-        publish_path = publish_template.apply_fields(fields)
-        publish_path = os.path.normpath(publish_path)
-        item.properties["path"] = publish_path
-
-        # Remove the filename from the work path
-        destination_path = os.path.split(publish_path)[0]
-
-        # Stash the destination path in properties
-        item.properties["destination_path"] = destination_path
-
-        # Set the Published File Type
-        item.properties["publish_type"] = "Unreal FBX"
-
-        # run the base class validation
-        # return super(UnrealAssetPublishPlugin, self).validate(settings, item)
 
         return True
 
@@ -229,16 +170,16 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         # Ensure that the destination path exists before exporting since the
         # Unreal FBX exporter doesn't check that
-        destination_path = item.properties["destination_path"]
-        self.parent.ensure_folder_exists(destination_path)
-
-        # Export the asset from Unreal
-        asset_path = item.properties["asset_path"]
-        asset_name = item.properties["asset_name"]
-        try:
-            _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name)
-        except Exception:
-            self.logger.debug("Asset %s cannot be exported to FBX." % (asset_path))
+        # destination_path = item.properties["destination_path"]
+        # self.parent.ensure_folder_exists(destination_path)
+        #
+        # # Export the asset from Unreal
+        # asset_path = item.properties["asset_path"]
+        # asset_name = item.properties["asset_name"]
+        # try:
+        #     _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name)
+        # except Exception:
+        #     self.logger.debug("Asset %s cannot be exported to FBX." % (asset_path))
         
         # let the base class register the publish
         # the publish_file will copy the file from the work path to the publish path
@@ -257,66 +198,3 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         """
         # do the base class finalization
         super(UnrealAssetPublishPlugin, self).finalize(settings, item)
-
-def _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name):
-    """
-    Export an asset to FBX from Unreal
-
-    :param destination_path: The path where the exported FBX will be placed
-    :param asset_path: The Unreal asset to export to FBX
-    :param asset_name: The asset name to use for the FBX filename
-    """
-    # Get an export task
-    task = _generate_fbx_export_task(destination_path, asset_path, asset_name)
-    if not task:
-        return False, None
-
-    # Do the FBX export
-    result = unreal.Exporter.run_asset_export_task(task)
-
-    if not result:
-        unreal.log_error("Failed to export {}".format(task.filename))
-        for error_msg in task.errors:
-            unreal.log_error("{}".format(error_msg))
-
-        return result, None
-
-    return result, task.filename
-    
-def _generate_fbx_export_task(destination_path, asset_path, asset_name):
-    """
-    Create and configure an Unreal AssetExportTask
-
-    :param destination_path: The path where the exported FBX will be placed
-    :param asset_path: The Unreal asset to export to FBX
-    :param asset_name: The FBX filename to export to
-    :return the configured AssetExportTask
-    """
-    loaded_asset = unreal.EditorAssetLibrary.load_asset(asset_path)
-
-    if not loaded_asset:
-        unreal.log_error("Failed to create FBX export task for {}: Could not load asset {}".format(asset_name, asset_path))
-        return None
-        
-    filename = os.path.join(destination_path, asset_name + ".fbx")
-    
-    # Setup AssetExportTask for non-interactive mode
-    task = unreal.AssetExportTask()
-    task.object = loaded_asset      # the asset to export
-    task.filename = filename        # the filename to export as
-    task.automated = True           # don't display the export options dialog
-    task.replace_identical = True   # always overwrite the output
-    
-    # Setup export options for the export task
-    task.options = unreal.FbxExportOption()
-    # These are the default options for the FBX export
-    task.options.fbx_export_compatibility = unreal.FbxExportCompatibility.FBX_2018
-    # task.options.ascii = False
-    # task.options.force_front_x_axis = False
-    # task.options.vertex_color = True
-    # task.options.level_of_detail = True
-    # task.options.collision = True
-    # task.options.welded_vertices = True
-    # task.options.map_skeletal_motion_to_root = False
-    
-    return task
