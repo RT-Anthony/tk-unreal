@@ -159,6 +159,7 @@ class UnrealSessionCollector(HookBaseClass):
             asset_type = str(asset.asset_class)
             
             item_type = "unreal.asset." + asset_type
+            self.logger.warning(item_type)
             asset_item = parent_item.create_item(
                 item_type,     # Include the asset type for the publish plugin to use
                 asset_type,    # display type
