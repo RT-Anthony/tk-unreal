@@ -148,6 +148,15 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         :param item: Item to process
         :returns: True if item is valid, False otherwise.
         """
+        asset_path = item.properties.get("asset_path")
+        asset_name = item.properties.get("asset_name")
+        self.logger.warning(asset_path)
+        self.logger.warning(asset_name)
+        if not asset_path or not asset_name:
+            self.logger.debug("Asset path or name not configured.")
+            return False
+
+        item.properties["publish_type"] = "Unreal Folder"
 
         return True
 

@@ -68,7 +68,11 @@ class UnrealActions(HookBaseClass):
                                      "params": None,
                                      "caption": "Import into Content Browser",
                                      "description": "This will import the asset into the Unreal Editor Content Browser."})
-        
+        elif "migrate_content" in actions:
+            action_instances.append({"name": "migrate_content",
+                                     "params": None,
+                                     "caption": "Import into Content Browser",
+                                     "description": "This will import the asset into the Unreal Editor Content Browser."})
         return action_instances
 
     def execute_multiple_actions(self, actions):
