@@ -156,7 +156,31 @@ class UnrealAssetPublishPlugin(HookBaseClass):
             self.logger.debug("Asset path or name not configured.")
             return False
 
+        publish_template = item.properties.get("publish_template")
+        if not publish_template:
+            self.logger.debug("No publish template configured.")
+            return False
+
+        # Add the Unreal asset name to the fields
+        fields = {"name": asset_name}
+
+        # Add today's date to the fields
+        date = datetime.date.today()
+        fields["YYYY"] = date.year
+        fields["MM"] = date.month
+        fields["DD"] = date.day
+
         item.properties["publish_type"] = "Unreal Folder"
+        publish_path = publish_template.apply_fields(fields)
+        publish_path = os.path.normpath(publish_path)
+        item.properties["path"] = publish_path
+
+        # Remove the filename from the work path
+        destination_path = os.path.split(publish_path)[0]
+
+        # Stash the destination path in properties
+        item.properties["destination_path"] = destination_path
+        self.logger.warning(destination_path)
 
         return True
 
@@ -183,16 +207,12 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         # self.parent.ensure_folder_exists(destination_path)
         #
         # # Export the asset from Unreal
-        # asset_path = item.properties["asset_path"]
-        # asset_name = item.properties["asset_name"]
-        # try:
-        #     _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name)
-        # except Exception:
-        #     self.logger.debug("Asset %s cannot be exported to FBX." % (asset_path))
-        
-        # let the base class register the publish
-        # the publish_file will copy the file from the work path to the publish path
-        # if the item is provided with the worK_template and publish_template properties
+        destination_path = item.properties["destination_path"]
+        self.parent.ensure_folder_exists(destination_path)
+
+        asset_path = item.properties["asset_path"]
+        asset_name = item.properties["asset_name"]
+
         super(UnrealAssetPublishPlugin, self).publish(settings, item)
 
     def finalize(self, settings, item):
