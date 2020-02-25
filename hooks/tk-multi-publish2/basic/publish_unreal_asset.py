@@ -151,8 +151,6 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         """
         asset_path = item.properties.get("asset_path")
         asset_name = item.properties.get("asset_name")
-        self.logger.warning(asset_path)
-        self.logger.warning(asset_name)
         if not asset_path or not asset_name:
             self.logger.debug("Asset path or name not configured.")
             return False
@@ -181,7 +179,6 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         # Stash the destination path in properties
         item.properties["destination_path"] = destination_path
-        self.logger.warning(destination_path)
 
         return True
 

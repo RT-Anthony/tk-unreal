@@ -142,13 +142,10 @@ class UnrealActions(HookBaseClass):
         unreal.EditorAssetLibrary.delete_directory(destination_path)
         ue = unreal.ShotgunEngine.get_instance()
         work_dir = ue.get_shotgun_work_dir()
-        self.logger.warning("Work dir: {}".format(work_dir))
         _path = destination_path.replace("Game", "Content", 1)
         _path = work_dir + _path
-        self.logger.warning("_path = {}".format(_path))
         shutil.copytree(path, _path)
-        self.logger.warning("Name = {}".format(sg_publish_data["name"]))
-        asset = unreal.EditorAssetLibrary.load_asset(destination_path + sg_publish_data["name"].split(".")[0])
+        asset = unreal.EditorAssetLibrary.load_asset(destination_path)
 
     def _import_to_content_browser(self, path, sg_publish_data):
         """
