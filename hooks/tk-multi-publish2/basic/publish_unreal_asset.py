@@ -4,6 +4,7 @@
 
 import sgtk
 import os
+import shutil
 import unreal
 import datetime
 
@@ -212,6 +213,14 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         asset_path = item.properties["asset_path"]
         asset_name = item.properties["asset_name"]
+
+        ue = unreal.ShotgunEngine.get_instance()
+        work_dir = ue.get_shotgun_work_dir()
+        path = asset_path.split("/")[2:-1]
+        path = "/".join(path)
+
+        path = os.path.join(work_dir, "Content", path)
+        shutil.copytree(path, destination_path)
 
         super(UnrealAssetPublishPlugin, self).publish(settings, item)
 

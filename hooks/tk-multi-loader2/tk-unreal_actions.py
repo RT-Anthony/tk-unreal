@@ -8,6 +8,7 @@ Hook that loads defines all the available actions, broken down by publish type.
 
 import pprint
 import os
+import shutil
 import sgtk
 import unreal
 import re
@@ -125,12 +126,25 @@ class UnrealActions(HookBaseClass):
 
         if name == "import_content":
             self._import_to_content_browser(path, sg_publish_data)
+        elif name == "migrate_content":
+            self._migrate_folder(path, sg_publish_data)
         else:
             try:
                 HookBaseClass.execute_action(self, name, params, sg_publish_data)
             except AttributeError:
                 # base class doesn't have the method, so ignore and continue
                 pass
+
+    def _migrate_folder(self, path, sg_publish_data):
+        destination_path, destination_name = self._get_destination_path_and_name(sg_publish_data)
+
+        #  Remove path if it exists
+        unreal.EditorAssetLibrary.delete_directory(destination_path)
+        ue = unreal.ShotgunEngine.get_instance()
+        work_dir = ue.get_shotgun_work_dir()
+        _path = destination_path.replace("Game", "Content", 1)
+        _path = os.path.join(work_dir, _path)
+        shutil.copytree(path, _path)
 
     def _import_to_content_browser(self, path, sg_publish_data):
         """
