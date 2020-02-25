@@ -114,23 +114,23 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         :returns: dictionary with boolean keys accepted, required and enabled
         """
-        
+
         accepted = True
-        # publisher = self.parent
-        #
-        # # ensure the publish template is defined
-        # publish_template_setting = settings.get("Publish Template")
-        # publish_template = publisher.get_template_by_name(publish_template_setting.value)
-        # if not publish_template:
-        #     self.logger.debug(
-        #         "A publish template could not be determined for the "
-        #         "asset item. Not accepting the item."
-        #     )
-        #     accepted = False
-        #
-        # # we've validated the work and publish templates. add them to the item properties
-        # # for use in subsequent methods
-        # item.properties["publish_template"] = publish_template
+        publisher = self.parent
+
+        # ensure the publish template is defined
+        publish_template_setting = settings.get("Publish Template")
+        publish_template = publisher.get_template_by_name(publish_template_setting.value)
+        if not publish_template:
+            self.logger.debug(
+                "A publish template could not be determined for the "
+                "asset item. Not accepting the item."
+            )
+            accepted = False
+
+        # we've validated the work and publish templates. add them to the item properties
+        # for use in subsequent methods
+        item.properties["publish_template"] = publish_template
 
         return {
             "accepted": accepted,
