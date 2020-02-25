@@ -147,6 +147,7 @@ class UnrealActions(HookBaseClass):
         _path = work_dir + _path
         self.logger.warning("_path = {}".format(_path))
         shutil.copytree(path, _path)
+        self.logger.warning("Name = {}".format(sg_publish_data["name"]))
         asset = unreal.EditorAssetLibrary.load_asset(destination_path + sg_publish_data["name"].split(".")[0])
 
     def _import_to_content_browser(self, path, sg_publish_data):
