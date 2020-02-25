@@ -216,7 +216,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         ue = unreal.ShotgunEngine.get_instance()
         work_dir = ue.get_shotgun_work_dir()
-        path = asset_path.split("/")[2:-1]
+        path = str(asset_path).split("/")[2:-1]
         path = "/".join(path)
 
         path = os.path.join(work_dir, "Content", path)
