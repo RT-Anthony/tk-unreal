@@ -145,6 +145,7 @@ class UnrealActions(HookBaseClass):
         self.logger.warning("Work dir: {}".format(work_dir))
         _path = destination_path.replace("Game", "Content", 1)
         _path = os.path.join(work_dir, _path)
+        self.logger.warning("_path = {}".format(_path))
         shutil.copytree(path, _path)
 
     def _import_to_content_browser(self, path, sg_publish_data):
