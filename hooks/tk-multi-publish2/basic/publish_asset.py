@@ -172,11 +172,12 @@ class UnrealAssetPublishPlugin(HookBaseClass):
             self.logger.debug("Asset path or name not configured.")
             return False
 
-        publish_template = item.properties.get("publish_template")
+        publish_template = sgtk.templates["unreal_asset_migrate"]
+        #publish_template = item.properties.get("publish_template")
         if not publish_template:
             self.logger.debug("No publish template configured.")
             return False
-
+        self.logger.warning(publish_template)
         # Add the Unreal asset name to the fields
         fields = {"name" : asset_name}
 
