@@ -220,6 +220,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         path = "/".join(path)
 
         path = os.path.join(work_dir, "Content", path)
+        destination_path = os.path.join(destination_path, asset_name)
         shutil.copytree(path, destination_path)
 
         super(UnrealAssetPublishPlugin, self).publish(settings, item)
