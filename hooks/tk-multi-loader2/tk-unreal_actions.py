@@ -142,6 +142,7 @@ class UnrealActions(HookBaseClass):
         unreal.EditorAssetLibrary.delete_directory(destination_path)
         ue = unreal.ShotgunEngine.get_instance()
         work_dir = ue.get_shotgun_work_dir()
+        self.logger.warning("Work dir: {}".format(work_dir))
         _path = destination_path.replace("Game", "Content", 1)
         _path = os.path.join(work_dir, _path)
         shutil.copytree(path, _path)
