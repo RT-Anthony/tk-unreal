@@ -13,6 +13,15 @@ import sgtk
 import unreal
 import re
 
+
+@unreal.uclass()
+class MyEditorUtility(unreal.GlobalEditorUtilityBase):
+    pass
+
+
+editor_util = MyEditorUtility()
+
+
 HookBaseClass = sgtk.get_hook_baseclass()
 
 
@@ -74,6 +83,11 @@ class UnrealActions(HookBaseClass):
                                      "params": None,
                                      "caption": "Import into Content Browser",
                                      "description": "This will import the asset into the Unreal Editor Content Browser."})
+        elif "import_animation" in actions:
+            action_instances.append({"name": "import_animation",
+                                     "params": None,
+                                     "caption": "Import into Content Browser",
+                                     "description": "This will import the asset into the Unreal Editor Content Browser."})
         return action_instances
 
     def execute_multiple_actions(self, actions):
@@ -128,12 +142,40 @@ class UnrealActions(HookBaseClass):
             self._import_to_content_browser(path, sg_publish_data)
         elif name == "migrate_content":
             self._migrate_folder(path, sg_publish_data)
+        elif name == "import_animation":
+            self._import_animation(path, sg_publish_data)
         else:
             try:
                 HookBaseClass.execute_action(self, name, params, sg_publish_data)
             except AttributeError:
                 # base class doesn't have the method, so ignore and continue
                 pass
+
+    def _import_animation(self, path, sg_publish_data):
+        skeleton = editor_util.get_selected_assets()[0]
+
+        context = self.sgtk.context_from_entity_dictionary(sg_publish_data)
+        name = os.path.basename(path).split(".")[0]
+        destination_path = "/Game/Animation/{shot}/{name}".format(target=context.entity["code"], name=name)
+
+        task = unreal.AssetImportTask()
+        task.filename = path
+        task.destination_path = destination_path
+        task.replace_existing = True
+        task.automated = True
+        task.save = True
+
+        task.options = unreal.FbxImportUI()
+        task.options.import_mesh = False
+        task.options.import_materials = False
+        task.options.create_physics_asset = False
+        task.options.import_textures = False
+        task.options.import_animations = True
+        task.options.import_as_skeletal = False
+        task.options.skeleton = skeleton
+        task.options.mesh_type_to_import = unreal.FBXImportType.FBXIT_ANIMATION
+
+        unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
     def _migrate_folder(self, path, sg_publish_data):
         destination_path, destination_name = self._get_destination_path_and_name(sg_publish_data)
