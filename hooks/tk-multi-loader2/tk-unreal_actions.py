@@ -156,7 +156,7 @@ class UnrealActions(HookBaseClass):
 
         context = self.sgtk.context_from_entity_dictionary(sg_publish_data)
         name = os.path.basename(path).split(".")[0]
-        self.logger.warning(str(context))
+        self.logger.warning(sg_publish_data)
         destination_path = "/Game/Animation/{shot}/{name}".format(target=context.entity["code"], name=name)
 
         task = unreal.AssetImportTask()
